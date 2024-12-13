@@ -1,16 +1,34 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../config/database";
 
-export class User extends Model {
-  public id!: number;
-  public username!: string;
-  public email!: string;
-  public password!: string;
-
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+// Define the attributes for the User model
+interface UserAttributes {
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
+// Define optional fields for creation
+interface UserCreationAttributes
+  extends Optional<UserAttributes, "id" | "createdAt" | "updatedAt"> {}
+
+// Extend the Sequelize Model class
+class User
+  extends Model<UserAttributes, UserCreationAttributes>
+  implements UserAttributes
+{
+  public id!: number;
+  public name!: string;
+  public email!: string;
+  public password!: string;
+  public createdAt!: Date;
+  public updatedAt!: Date;
+}
+
+// Initialize the model
 User.init(
   {
     id: {
@@ -18,7 +36,7 @@ User.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    username: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -34,9 +52,22 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
-    sequelize,
+    sequelize, // Database connection instance
     tableName: "users",
+    timestamps: true, // Automatically adds `createdAt` and `updatedAt` fields
+    underscored: true, // Use snake_case in the database
   }
 );
+
+export default User;

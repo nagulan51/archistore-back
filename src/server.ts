@@ -1,12 +1,22 @@
-import express, { Request, Response } from "express";
+import express, { Application } from "express";
+import { sequelize } from "./config/database";
+import userRoutes from "./routes/auth.routes";
+import adminRoutes from "./routes/admin.routes";
+import authRouter from "./routes/auth.routes";
 
-const app = express();
-const port = process.env.PORT || 3000;
+const app: Application = express();
+const PORT = process.env.PORT || 3000;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Salut !");
-});
+app.use(express.json());
 
-app.listen(port, () => {
-  console.log(`je tourne sur ce lien :  http://localhost:${port}`);
+app.use("/api/auth", userRoutes);
+
+sequelize
+  .sync({ alter: true }) // Use { force: true } only during development
+  .then(() => console.log("Database connected and synced"))
+  .catch((err) => console.error("Database connection error:", err));
+
+// Start Server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
