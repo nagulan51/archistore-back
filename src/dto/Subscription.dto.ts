@@ -11,14 +11,15 @@ import {
 export class CreateSubscriptionDTO {
   @IsInt()
   @IsNotEmpty()
-  userId!: number;
+  userId: number;
 
   @IsString()
   @IsNotEmpty()
-  plan!: string;
+  plan: string;
 
+  @IsOptional()
   @IsDateString()
-  startDate!: Date;
+  startDate?: Date | null;
 
   @IsOptional()
   @IsDateString()
@@ -26,6 +27,20 @@ export class CreateSubscriptionDTO {
 
   @IsEnum(["cash", "stripe", "paypal"])
   paymentMethod!: "cash" | "stripe" | "paypal";
+
+  constructor(
+    userId: number,
+    plan: string,
+    startDate: Date | null,
+    endDate: Date | null,
+    paymentMethod: "cash" | "stripe" | "paypal"
+  ) {
+    this.userId = userId;
+    this.plan = plan;
+    this.startDate = startDate;
+    this.endDate = endDate;
+    this.paymentMethod = paymentMethod;
+  }
 }
 
 export class UpdateSubscriptionDTO {

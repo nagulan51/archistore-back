@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../config/database";
 import User from "./user.model";
-
+import Plan from "./plan.model";
 // Define the attributes for the Subscription model
 interface SubscriptionAttributes {
   id: number;
@@ -54,8 +54,13 @@ Subscription.init(
       onDelete: "CASCADE", // Delete subscription if the user is deleted
     },
     plan: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
+      references: {
+        model: Plan, // Reference the Plan model
+        key: "id", // Plan's id field
+      },
+      onDelete: "CASCADE",
     },
     status: {
       type: DataTypes.ENUM("active", "inactive", "cancelled"),
@@ -94,9 +99,17 @@ Subscription.init(
   }
 );
 
+User.hasMany(Subscription, {
+  foreignKey: "userId",
+  as: "subscriptions",
+});
 Subscription.belongsTo(User, {
   foreignKey: "userId",
   as: "user",
 });
 
+Subscription.hasMany(Plan, {
+  foreignKey: "planId", // Ensure it's referencing the planId
+  as: "subscriptions",
+});
 export default Subscription;

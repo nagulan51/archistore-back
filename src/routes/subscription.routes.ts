@@ -6,17 +6,27 @@ import {
   updateSubscription,
   deleteSubscription,
 } from "../controllers/subscription.controller";
+import { validateRequest } from "../middlewares/validateRequest";
+
+import { authenticate, authorize } from "../middlewares/auth.middleware";
+import { CreateSubscriptionDTO } from "../dto/subscription.dto"; // Import the correct DTO class
 
 const subscriptionRouter = Router();
 
-subscriptionRouter.post("/", createSubscription);
+// Correctly pass the DTO class to the validateRequest middleware
+subscriptionRouter.post(
+  "/",
+  authenticate,
+  validateRequest(CreateSubscriptionDTO), // Pass the DTO class, not the controller
+  createSubscription
+);
 
-subscriptionRouter.get("/", getSubscriptions);
+subscriptionRouter.get("/", authenticate, getSubscriptions);
 
-subscriptionRouter.get("/:id", getSubscriptionById);
+subscriptionRouter.get("/:id", authenticate, getSubscriptionById);
 
-subscriptionRouter.put("/:id", updateSubscription);
+subscriptionRouter.put("/:id", authenticate, updateSubscription);
 
-subscriptionRouter.delete("/:id", deleteSubscription);
+subscriptionRouter.delete("/:id", authenticate, deleteSubscription);
 
 export default subscriptionRouter;
