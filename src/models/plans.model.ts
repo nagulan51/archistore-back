@@ -1,37 +1,37 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../config/database";
 
-// Define the attributes for the User model
-interface UserAttributes {
+// Define the attributes for the Plan model
+interface PlanAttributes {
   id: number;
   name: string;
-  email: string;
-  password: string;
+  description: string;
+  price: number;
+  duration: number; // Duration in days
   createdAt?: Date;
   updatedAt?: Date;
-  role: "client" | "admin" | "moderator"; // Role options as a TypeScript union type
 }
 
 // Define optional fields for creation
-interface UserCreationAttributes
-  extends Optional<UserAttributes, "id" | "createdAt" | "updatedAt"> {}
+interface PlanCreationAttributes
+  extends Optional<PlanAttributes, "id" | "createdAt" | "updatedAt"> {}
 
 // Extend the Sequelize Model class
-class User
-  extends Model<UserAttributes, UserCreationAttributes>
-  implements UserAttributes
+class Plan
+  extends Model<PlanAttributes, PlanCreationAttributes>
+  implements PlanAttributes
 {
   public id!: number;
   public name!: string;
-  public email!: string;
-  public password!: string;
+  public description!: string;
+  public price!: number;
+  public duration!: number; // Duration in days
   public createdAt!: Date;
   public updatedAt!: Date;
-  public role!: "client" | "admin" | "moderator"; // Ensure TypeScript enforces enum-like behavior
 }
 
 // Initialize the model
-User.init(
+Plan.init(
   {
     id: {
       type: DataTypes.INTEGER.UNSIGNED,
@@ -42,17 +42,20 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true,
-      },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
-    password: {
-      type: DataTypes.STRING,
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
+    },
+    duration: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      validate: {
+        min: 1, // Minimum duration is 1 day
+      },
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -63,18 +66,13 @@ User.init(
       type: DataTypes.DATE,
       allowNull: true,
     },
-    role: {
-      type: DataTypes.ENUM("client", "admin", "moderator"), // Enum options
-      allowNull: false,
-      defaultValue: "client", // Set default to match the enum options
-    },
   },
   {
     sequelize, // Database connection instance
-    tableName: "users",
+    tableName: "plans",
     timestamps: true, // Automatically adds `createdAt` and `updatedAt` fields
     underscored: true, // Use snake_case in the database
   }
 );
 
-export default User;
+export default Plan;

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { File } from "../models/file.model";
 
-// Upload a file
+// televerser un fichier
 export const uploadFile = async (req: Request, res: Response) => {
   try {
     const { originalname, size, path } = req.file!;
@@ -20,7 +20,7 @@ export const uploadFile = async (req: Request, res: Response) => {
   }
 };
 
-// Get all files for the logged-in user
+// recupérer tous les fichiers un utilisateur
 export const getFiles = async (req: Request, res: Response) => {
   try {
     const userId = req.body.userId;
@@ -32,7 +32,7 @@ export const getFiles = async (req: Request, res: Response) => {
   }
 };
 
-// Get a file by ID for the logged-in user
+// recupérer un fichier par son id
 export const getFileById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -49,7 +49,7 @@ export const getFileById = async (req: Request, res: Response) => {
   }
 };
 
-// Delete a file by ID for the logged-in user
+// suppresion de fichier par ID
 export const deleteFile = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -67,7 +67,6 @@ export const deleteFile = async (req: Request, res: Response) => {
   }
 };
 
-// Filter files for the logged-in user
 export const filterFiles = async (req: Request, res: Response) => {
   const { name, size, date } = req.query;
   try {

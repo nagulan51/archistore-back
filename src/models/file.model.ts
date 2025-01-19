@@ -6,6 +6,7 @@ export class File extends Model {
   public id!: number;
   public name!: string;
   public size!: number;
+  public path!: string;
   public userId!: number;
   public createdAt!: Date;
   public updatedAt!: Date;
@@ -23,7 +24,11 @@ File.init(
       allowNull: false,
     },
     size: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DOUBLE,
+      allowNull: false,
+    },
+    path: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     userId: {

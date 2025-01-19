@@ -11,10 +11,9 @@ import { authenticate } from "../middlewares/auth.middleware";
 
 const FileRouter = Router();
 
-// Multer configuration for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Directory to store uploaded files
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -23,7 +22,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Protect all routes
 FileRouter.use(authenticate);
 
 FileRouter.post("/upload", upload.single("file"), uploadFile);
