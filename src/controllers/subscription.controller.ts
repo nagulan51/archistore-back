@@ -214,3 +214,39 @@ export const deleteSubscription = async (req: Request, res: Response) => {
     });
   }
 };
+export const getCurrentUsage = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.body;
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const subscriptions = await Subscription.findAll({
+      where: {
+        userId,
+      },
+    });
+
+    let totalallowed = 0;
+
+    await Promise.all(
+      subscriptions.map(async (subscription) => {
+        const plan = await Plan.findByPk(subscription.planId);
+        if (!plan) {
+          throw new Error("Plan not found");
+        }
+
+        totalallowed += plan.storageSize;
+      })
+    );
+
+    res.status(200).json({ total: totalallowed });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error getting current usage",
+      error: (err as Error).message,
+    });
+  }
+};

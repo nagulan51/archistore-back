@@ -5,6 +5,7 @@ import {
   getSubscriptionById,
   updateSubscription,
   deleteSubscription,
+  getCurrentUsage,
 } from "../controllers/subscription.controller";
 import { validateRequest } from "../middlewares/validateRequest";
 
@@ -22,6 +23,7 @@ subscriptionRouter.post(
 
 subscriptionRouter.get("/", authenticate, getSubscriptions);
 
+subscriptionRouter.get("/getcurrentusage", authenticate, getCurrentUsage);
 subscriptionRouter.get("/:id", authenticate, getSubscriptionById);
 
 subscriptionRouter.put("/:id", authenticate, updateSubscription);
