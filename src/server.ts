@@ -17,7 +17,7 @@ app.use("/api/subscriptions", subscriptionRouter);
 app.use("/api/plans", Planrouter);
 
 sequelize
-  .sync({ alter: true })
+  .sync({ alter: false, force: false })
   .then(() => console.log("Database connected and synced"))
   .catch((err) => console.error("Database connection error:", err));
 

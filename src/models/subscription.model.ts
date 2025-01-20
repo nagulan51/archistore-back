@@ -1,38 +1,17 @@
-import { DataTypes, Model, Optional } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/database";
 import User from "./user.model";
 import Plan from "./plan.model";
-// Define the attributes for the Subscription model
-interface SubscriptionAttributes {
-  id: number;
-  userId: number;
-  plan: string;
-  status: "active" | "inactive" | "cancelled";
-  startDate: Date;
-  endDate?: Date | null; // Optional, null for never expiring
-  paymentMethod: "cash" | "stripe" | "paypal"; // New field for payment method
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+import Payment from "./payment.model";
 
-// Define optional fields for creation
-interface SubscriptionCreationAttributes
-  extends Optional<
-    SubscriptionAttributes,
-    "id" | "createdAt" | "updatedAt" | "endDate"
-  > {}
-
-class Subscription
-  extends Model<SubscriptionAttributes, SubscriptionCreationAttributes>
-  implements SubscriptionAttributes
-{
+class Subscription extends Model {
   public id!: number;
   public userId!: number;
-  public plan!: string;
+  public planId!: number;
+  public paymentId!: number;
   public status!: "active" | "inactive" | "cancelled";
   public startDate!: Date;
-  public endDate?: Date | null; // Explicit null for never expiring
-  public paymentMethod!: "cash" | "stripe" | "paypal"; // New payment method field
+  public endDate!: Date | null;
   public createdAt!: Date;
   public updatedAt!: Date;
 }
@@ -51,21 +30,27 @@ Subscription.init(
         model: User,
         key: "id",
       },
-      onDelete: "CASCADE", // Delete subscription if the user is deleted
     },
-    plan: {
+    planId: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       references: {
-        model: Plan, // Reference the Plan model
-        key: "id", // Plan's id field
+        model: Plan,
+        key: "id",
       },
-      onDelete: "CASCADE",
     },
+    paymentId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      references: {
+        model: Payment, // Reference to Payment model
+        key: "id",
+      },
+    },
+
     status: {
       type: DataTypes.ENUM("active", "inactive", "cancelled"),
       allowNull: false,
-      defaultValue: "active",
     },
     startDate: {
       type: DataTypes.DATE,
@@ -75,11 +60,6 @@ Subscription.init(
     endDate: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: null, // Null indicates no expiration
-    },
-    paymentMethod: {
-      type: DataTypes.ENUM("cash", "stripe", "paypal"),
-      allowNull: false, // This field is required
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -89,6 +69,7 @@ Subscription.init(
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: true,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
@@ -99,17 +80,14 @@ Subscription.init(
   }
 );
 
-User.hasMany(Subscription, {
-  foreignKey: "userId",
-  as: "subscriptions",
-});
-Subscription.belongsTo(User, {
-  foreignKey: "userId",
-  as: "user",
-});
+// Define associations after both models are initialized
+User.hasMany(Subscription, { foreignKey: "userId", as: "subscriptions" });
+Subscription.belongsTo(User, { foreignKey: "userId", as: "user" });
 
-Subscription.hasMany(Plan, {
-  foreignKey: "planId", // Ensure it's referencing the planId
-  as: "subscriptions",
-});
+Plan.hasMany(Subscription, { foreignKey: "planId", as: "subscriptions" });
+Subscription.belongsTo(Plan, { foreignKey: "planId", as: "subscriptionPlan" });
+
+Payment.hasMany(Subscription, { foreignKey: "paymentId", as: "subscriptions" });
+Subscription.belongsTo(Payment, { foreignKey: "paymentId", as: "payment" });
+
 export default Subscription;

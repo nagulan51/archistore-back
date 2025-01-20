@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import { validate } from "class-validator";
 import Subscription from "../models/subscription.model";
+import User from "../models/user.model";
+import Plan from "../models/plan.model";
+import Payment from "../models/payment.model";
 import {
   CreateSubscriptionDTO,
   UpdateSubscriptionDTO,
@@ -10,25 +13,41 @@ export const createSubscription = async (req: Request, res: Response) => {
   try {
     const {
       userId,
-      plan,
+      planId,
       startDate,
-      endDate,
       paymentMethod,
+      statutJuridique,
+      firstname,
+      lastname,
+      rue,
+      codePostal,
+      ville,
     }: CreateSubscriptionDTO = req.body;
 
     // Create DTO instance
     const dto = new CreateSubscriptionDTO(
       userId,
-      plan,
+      planId,
       startDate ? startDate : null,
-      endDate ? endDate : null,
-      paymentMethod
+      null,
+      paymentMethod,
+      statutJuridique,
+      firstname,
+      lastname,
+      rue,
+      codePostal,
+      ville
     );
     dto.userId = userId;
-    dto.plan = plan;
+    dto.planId = planId;
     dto.startDate = startDate;
-    dto.endDate = endDate;
     dto.paymentMethod = paymentMethod;
+    dto.statutJuridique = statutJuridique;
+    dto.firstname = firstname;
+    dto.lastname = lastname;
+    dto.rue = rue;
+    dto.codePostal = codePostal;
+    dto.ville = ville;
 
     // Validate DTO instance
     const errors = await validate(dto);
@@ -42,24 +61,48 @@ export const createSubscription = async (req: Request, res: Response) => {
         })),
       });
     }
-
-    // Create subscription if validation passes
+    //verifier si l'utilisateur existe
+    const user = await User.findByPk(userId);
+    console.log(userId);
+    if (!user) {
+      return res.status(404).json({ message: "utilisateur n existe pas" });
+    }
+    const plan = await Plan.findByPk(planId);
+    if (!plan) {
+      return res.status(404).json({ message: "le plan demandé n existe pas" });
+    }
+    const payment = await Payment.create({
+      userId,
+      method: paymentMethod,
+      amount: plan.price,
+      tvaPercent: plan.tvaPercent,
+      statutJuridique,
+      siret: null,
+      firstname,
+      lastname,
+      rue,
+      codePostal,
+      ville,
+    });
+    console.log(payment);
+    // créer un abonnement si la validation passe
     const subscription = await Subscription.create({
       userId,
-      plan,
+      planId,
       startDate: startDate ? startDate : new Date(),
-      endDate,
+      paymentId: payment.id,
+      endDate: null,
       status: "active",
       paymentMethod,
     });
 
     res.status(201).json({
-      message: "Subscription created successfully",
+      message: "souscription créée avec succès",
       subscription,
     });
   } catch (err) {
     res.status(500).json({
-      message: "Error creating subscription",
+      message: "erreur lors de la création de la souscription",
       error: (err as Error).message,
     });
   }
@@ -83,13 +126,15 @@ export const getSubscriptionById = async (req: Request, res: Response) => {
 
     const subscription = await Subscription.findByPk(id);
     if (!subscription) {
-      return res.status(404).json({ message: "Subscription not found" });
+      return res
+        .status(404)
+        .json({ message: "impossible de trouver la souscription" });
     }
 
     res.status(200).json(subscription);
   } catch (err) {
     res.status(500).json({
-      message: "Error retrieving subscription",
+      message: "erreur lors de la récupération de la souscription",
       error: (err as Error).message,
     });
   }
@@ -98,12 +143,17 @@ export const getSubscriptionById = async (req: Request, res: Response) => {
 export const updateSubscription = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { plan, status, endDate, paymentMethod }: UpdateSubscriptionDTO =
+    const { planId, status, endDate, paymentMethod }: UpdateSubscriptionDTO =
       req.body;
 
     // Create DTO instance
-    const dto = new UpdateSubscriptionDTO();
-    dto.plan = plan;
+    const dto = new UpdateSubscriptionDTO(
+      planId,
+      status,
+      endDate ? endDate : null,
+      paymentMethod
+    );
+    dto.planId = planId;
     dto.status = status;
     dto.endDate = endDate;
     dto.paymentMethod = paymentMethod;
@@ -127,10 +177,9 @@ export const updateSubscription = async (req: Request, res: Response) => {
     }
 
     // Update subscription if validation passes
-    subscription.plan = plan || subscription.plan;
+    subscription.planId = planId || subscription.planId;
     subscription.status = status || subscription.status;
     subscription.endDate = endDate || subscription.endDate;
-    subscription.paymentMethod = paymentMethod || subscription.paymentMethod;
 
     await subscription.save();
 

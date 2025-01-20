@@ -1,13 +1,14 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../config/database";
-import User from "./user.model"; // Assuming you have a user model
 
 class Plan extends Model {
   public id!: number;
   public name!: string;
   public description!: string;
   public price!: number;
-  public duration!: number; // Duration in months or other unit
+  public tvaPercent!: number;
+  public duration!: number;
+  public storageSize!: number;
   public createdAt!: Date;
   public updatedAt!: Date;
 }
@@ -15,7 +16,7 @@ class Plan extends Model {
 Plan.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER.UNSIGNED, // Changed to UNSIGNED to match the subscription table
       primaryKey: true,
       autoIncrement: true,
     },
@@ -31,24 +32,37 @@ Plan.init(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
+    tvaPercent: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
     duration: {
       type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: "Durée de validité en mois",
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: DataTypes.NOW,
+    },
+    storageSize: {
+      type: DataTypes.INTEGER,
       allowNull: false,
-      comment: "Duration of the plan in months",
+      comment: "Taille de stockage en Mo",
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
     sequelize,
     tableName: "plans",
+    timestamps: true,
+    underscored: true, // Added to match the subscription table's naming convention
   }
 );
-
-// Add associations
-Plan.hasMany(User, {
-  foreignKey: "planId",
-});
-User.belongsTo(Plan, {
-  foreignKey: "planId",
-});
 
 export default Plan;

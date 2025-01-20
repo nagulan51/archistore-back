@@ -13,11 +13,10 @@ import { CreateSubscriptionDTO } from "../dto/subscription.dto"; // Import the c
 
 const subscriptionRouter = Router();
 
-// Correctly pass the DTO class to the validateRequest middleware
 subscriptionRouter.post(
   "/",
   authenticate,
-  validateRequest(CreateSubscriptionDTO), // Pass the DTO class, not the controller
+  validateRequest(CreateSubscriptionDTO),
   createSubscription
 );
 

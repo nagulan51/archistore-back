@@ -6,22 +6,31 @@ import { validate } from "class-validator";
 
 export const createPlan = async (req: Request, res: Response) => {
   try {
-    const { name, description, price, duration }: CreatePlanDto = req.body;
+    const {
+      name,
+      description,
+      price,
+      storageSize,
+      duration,
+      tvaPercent,
+    }: CreatePlanDto = req.body;
 
     const plan = await Plan.create({
       name,
       description,
       price,
+      storageSize,
       duration,
+      tvaPercent,
     });
 
     res.status(201).json({
-      message: "Plan created successfully",
+      message: "Plan crée avec succès",
       plan,
     });
   } catch (err) {
     res.status(500).json({
-      message: "Error creating plan",
+      message: "erreur lors de la création du plan",
       error: (err as Error).message,
     });
   }
@@ -33,7 +42,7 @@ export const getPlans = async (req: Request, res: Response) => {
     res.status(200).json({ plans });
   } catch (err) {
     res.status(500).json({
-      message: "Error fetching plans",
+      message: "Erreur lors de la récupération des plans",
       error: (err as Error).message,
     });
   }
@@ -46,13 +55,13 @@ export const getPlanById = async (req: Request, res: Response) => {
     const plan = await Plan.findByPk(id);
 
     if (!plan) {
-      return res.status(404).json({ message: "Plan not found" });
+      return res.status(404).json({ message: "plan non trouvé" });
     }
 
     res.status(200).json({ plan });
   } catch (err) {
     res.status(500).json({
-      message: "Error fetching plan",
+      message: "Erreur lors de la récupération du plan",
       error: (err as Error).message,
     });
   }
@@ -84,7 +93,7 @@ export const updatePlan = async (req: Request, res: Response) => {
     const plan = await Plan.findByPk(id);
 
     if (!plan) {
-      return res.status(404).json({ message: "Plan not found" });
+      return res.status(404).json({ message: "plan non trouvé" });
     }
 
     plan.name = name || plan.name;
@@ -95,12 +104,12 @@ export const updatePlan = async (req: Request, res: Response) => {
     await plan.save();
 
     res.status(200).json({
-      message: "Plan updated successfully",
+      message: "Plan mis à jour avec succès",
       plan,
     });
   } catch (err) {
     res.status(500).json({
-      message: "Error updating plan",
+      message: "Erreur lors de la mise à jour du plan",
       error: (err as Error).message,
     });
   }

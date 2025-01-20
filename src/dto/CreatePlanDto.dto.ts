@@ -14,6 +14,14 @@ export class CreatePlanDto {
   price: number;
 
   @IsNumber()
+  @Min(0)
+  tvaPercent: number;
+
+  @IsNumber()
+  @Min(1)
+  storageSize: number;
+
+  @IsNumber()
   @Min(1)
   duration: number;
 
@@ -21,11 +29,15 @@ export class CreatePlanDto {
     name: string,
     description: string,
     price: number,
+    tvaPercent: number,
+    storageSize: number,
     duration: number
   ) {
     this.name = name;
     this.description = description;
     this.price = price;
+    this.tvaPercent = tvaPercent;
+    this.storageSize = storageSize;
     this.duration = duration;
   }
 }
