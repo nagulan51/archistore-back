@@ -7,7 +7,7 @@ import Payment from "../models/payment.model";
 import {
   CreateSubscriptionDTO,
   UpdateSubscriptionDTO,
-} from "../dto/subscription.dto";
+} from "../dto/Subscription.dto";
 
 export const createSubscription = async (req: Request, res: Response) => {
   try {
