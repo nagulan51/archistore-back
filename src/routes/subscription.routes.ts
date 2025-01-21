@@ -10,7 +10,7 @@ import {
 import { validateRequest } from "../middlewares/validateRequest";
 
 import { authenticate, authorize } from "../middlewares/auth.middleware";
-import { CreateSubscriptionDTO } from "../dto/subscription.dto"; // Import the correct DTO class
+import { CreateSubscriptionDTO } from "../dto/Subscription.dto"; // Import the correct DTO class
 
 const subscriptionRouter = Router();
 
