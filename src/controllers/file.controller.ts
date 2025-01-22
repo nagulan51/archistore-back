@@ -6,8 +6,12 @@ import fs from "fs";
 // televerser un fichier
 export const uploadFile = async (req: Request, res: Response) => {
   try {
+    const quota = await File.sum("size", { where: { userId: req.user?.id } });
+    //log in gb
+    console.log(quota / 1000000000 + "GB");
     // const { originalname, size, path } = req.file!;
     const { size, path } = req.file!;
+
     const { originalName, randomName, fileType } = req.fileInfo!;
     const userId = req.user?.id;
     const file = await File.create({
