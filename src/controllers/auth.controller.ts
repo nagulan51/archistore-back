@@ -3,8 +3,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { validate } from "class-validator";
 import User from "../models/user.model";
-import { RegisterDto } from "../dto/register.dto";
-import { LoginDto } from "../dto/login.dto";
+import { RegisterDto } from "../dto/Register.dto";
+import { LoginDto } from "../dto/Login.dto";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dOl6VBeGRkimzwI7DzXgf47";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1h";
@@ -119,7 +119,7 @@ export const login = async (req: Request, res: Response) => {
 
 export const getCurrentUser = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.body;
+    const userId = req.user?.id;
 
     if (!userId) {
       return res.status(400).json({ message: "User ID is required" });

@@ -1,5 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: {
+      id: number;
+      role: string;
+    };
+  }
+}
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
@@ -9,28 +17,31 @@ export const authenticate = (
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers.authorization;
+  // Check if the token is in the Authorization header or query parameter
+  let token: string | undefined = req.headers.authorization
+    ? req.headers.authorization.split(" ")[1] // Extract token from "Bearer" header
+    : (req.query.token as string); // Get token from query parameter if not in header
 
-  // on verifie si le token est present
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!token) {
     return res
       .status(401)
       .json({ message: "Access denied. No token provided." });
   }
 
-  const token = authHeader.split(" ")[1];
-
   try {
-    //on verifie le token avec la clé secrete
+    // Verify the token using JWT secret
     const decoded = jwt.verify(token, JWT_SECRET) as {
       id: number;
       role: string;
     };
 
-    //on passe dans entete de la requete le userId et le role
-    req.body.userId = decoded.id;
-    req.body.role = decoded.role;
+    // Attach decoded user information to the request object
+    req.user = {
+      id: decoded.id,
+      role: decoded.role,
+    };
 
+    // Proceed to the next middleware
     next();
   } catch (err) {
     return res.status(401).json({ message: "Invalid token." });
@@ -39,9 +50,10 @@ export const authenticate = (
 
 export const authorize = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const userRole = req.body.role;
+    const userRole = req.user?.role;
+
     //on verifie si le role de l'utilisateur est dans le tableau des roles autorisés
-    if (!roles.includes(userRole)) {
+    if (!userRole || !roles.includes(userRole)) {
       return res
         .status(403)
         .json({ message: "Access denied. You do not have permission." });

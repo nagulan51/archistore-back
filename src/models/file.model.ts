@@ -6,10 +6,19 @@ export class File extends Model {
   public id!: number;
   public name!: string;
   public size!: number;
+  public type!: string;
   public path!: string;
+  public originalName!: string;
   public userId!: number;
   public createdAt!: Date;
   public updatedAt!: Date;
+
+  //pour des raisons de sécurité, nous ne voulons pas renvoyer le chemin du fichier
+  toJSON() {
+    const values = { ...this.get() };
+    delete values.path;
+    return values;
+  }
 }
 
 File.init(
@@ -27,7 +36,15 @@ File.init(
       type: DataTypes.DOUBLE,
       allowNull: false,
     },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     path: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    originalName: {
       type: DataTypes.STRING,
       allowNull: false,
     },

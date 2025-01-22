@@ -5,6 +5,7 @@ import adminRoutes from "./routes/admin.routes";
 import authRouter from "./routes/auth.routes";
 import subscriptionRouter from "./routes/subscription.routes";
 import Planrouter from "./routes/plan.routes";
+import FileRouter from "./routes/file.routes";
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
@@ -15,9 +16,10 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRouter);
 app.use("/api/subscriptions", subscriptionRouter);
 app.use("/api/plans", Planrouter);
+app.use("/api/files", FileRouter);
 
 sequelize
-  .sync({ alter: false, force: false })
+  .sync({ alter: true, force: false })
   .then(() => console.log("Database connected and synced"))
   .catch((err) => console.error("Database connection error:", err));
 

@@ -63,7 +63,6 @@ export const createSubscription = async (req: Request, res: Response) => {
     }
     //verifier si l'utilisateur existe
     const user = await User.findByPk(userId);
-    console.log(userId);
     if (!user) {
       return res.status(404).json({ message: "utilisateur n existe pas" });
     }
@@ -84,7 +83,6 @@ export const createSubscription = async (req: Request, res: Response) => {
       codePostal,
       ville,
     });
-    console.log(payment);
     // créer un abonnement si la validation passe
     const subscription = await Subscription.create({
       userId,
