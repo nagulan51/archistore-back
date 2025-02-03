@@ -19,7 +19,7 @@ app.use("/api/plans", Planrouter);
 app.use("/api/files", FileRouter);
 
 sequelize
-  .sync({ alter: true, force: false })
+  .sync({ alter: false, force: false })
   .then(() => console.log("Database connected and synced"))
   .catch((err) => console.error("Database connection error:", err));
 
