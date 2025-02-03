@@ -17,7 +17,10 @@ app.use("/api/auth", authRouter);
 app.use("/api/subscriptions", subscriptionRouter);
 app.use("/api/plans", Planrouter);
 app.use("/api/files", FileRouter);
-
+//404
+app.use((req, res, next) => {
+  res.status(404).json({ message: "Not found" });
+});
 sequelize
   .sync({ alter: false, force: false })
   .then(() => console.log("Database connected and synced"))
