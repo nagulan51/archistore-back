@@ -6,10 +6,13 @@ import authRouter from "./routes/auth.routes";
 import subscriptionRouter from "./routes/subscription.routes";
 import Planrouter from "./routes/plan.routes";
 import FileRouter from "./routes/file.routes";
+import cors from "cors";
+
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(cors());
 
 app.use("/api/auth", userRoutes);
 app.use("/api/admin", adminRoutes);
