@@ -61,11 +61,11 @@ export const register = async (req: Request, res: Response) => {
         updatedAt: user.updatedAt,
       },
     });
-    sendEmail(
+    /*  sendEmail(
       email,
       "Inscription réussie",
       `Bonjour ${name},\n\nVotre inscription a été effectuée avec succès.`
-    );
+    ); */
   } catch (err) {
     res.status(500).json({
       message: "Error registering user",
