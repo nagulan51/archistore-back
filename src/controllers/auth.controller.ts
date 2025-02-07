@@ -61,7 +61,7 @@ export const register = async (req: Request, res: Response) => {
         updatedAt: user.updatedAt,
       },
     });
-    createSubscription(req, res);
+    // createSubscription(req, res);
     /*  sendEmail(
       email,
       "Inscription réussie",
