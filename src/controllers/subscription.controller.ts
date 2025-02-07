@@ -4,11 +4,13 @@ import Subscription from "../models/subscription.model";
 import User from "../models/user.model";
 import Plan from "../models/plan.model";
 import Payment from "../models/payment.model";
+import { File } from "../models/file.model";
+
 import {
   CreateSubscriptionDTO,
   UpdateSubscriptionDTO,
 } from "../dto/Subscription.dto";
-
+import { getFiles } from "./file.controller";
 export const createSubscription = async (req: Request, res: Response) => {
   try {
     const {
@@ -228,7 +230,11 @@ export const getCurrentUsage = async (req: Request, res: Response) => {
     });
 
     let totalallowed = 0;
+    let usage = 0;
 
+    const files = await File.findAll({ where: { userId } });
+
+    usage = files.reduce((acc, file) => acc + file.size, 0);
     await Promise.all(
       subscriptions.map(async (subscription) => {
         const plan = await Plan.findByPk(subscription.planId);
@@ -240,7 +246,11 @@ export const getCurrentUsage = async (req: Request, res: Response) => {
       })
     );
 
-    res.status(200).json({ total: totalallowed });
+    res.status(200).json({
+      total: totalallowed,
+      usage: usage / 1000000000,
+      remaining: totalallowed - usage / 1000000000,
+    });
   } catch (err) {
     res.status(500).json({
       message: "Error getting current usage",

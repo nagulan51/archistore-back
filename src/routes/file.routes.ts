@@ -22,6 +22,7 @@ const allowedFileTypes = [
   "mp4",
   "mov",
   "docx",
+  "txt",
 ];
 
 //2GB max file size

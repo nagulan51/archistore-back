@@ -69,7 +69,9 @@ export const deleteFile = async (req: Request, res: Response) => {
     }
 
     await file.destroy();
-    res.status(204).send();
+    res.status(201).send({
+      message: "File deleted successfully",
+    });
   } catch (error) {
     res.status(500).json({ message: "Error deleting file", error });
   }
