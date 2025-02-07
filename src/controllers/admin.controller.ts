@@ -71,3 +71,18 @@ export const getDashboardStatistics = async (req: Request, res: Response) => {
       .json({ message: "Error fetching dashboard statistics", error });
   }
 };
+export const deleteClient = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const client = await User.findByPk(id);
+    if (!client) {
+      return res.status(404).json({ message: "Client not found" });
+    }
+
+    await client.destroy();
+
+    res.status(200).json({ message: "Client deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting client", error });
+  }
+};
