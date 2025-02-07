@@ -6,7 +6,7 @@ import User from "../models/user.model";
 import { RegisterDto } from "../dto/Register.dto";
 import { LoginDto } from "../dto/Login.dto";
 import { sendEmail } from "../utils/emailSender";
-
+import { createSubscription } from "./subscription.controller";
 const JWT_SECRET = process.env.JWT_SECRET || "dOl6VBeGRkimzwI7DzXgf47";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1h";
 
@@ -61,6 +61,7 @@ export const register = async (req: Request, res: Response) => {
         updatedAt: user.updatedAt,
       },
     });
+    createSubscription(req, res);
     /*  sendEmail(
       email,
       "Inscription réussie",

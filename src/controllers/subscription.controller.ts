@@ -107,7 +107,6 @@ export const createSubscription = async (req: Request, res: Response) => {
     });
   }
 };
-
 export const getSubscriptions = async (_req: Request, res: Response) => {
   try {
     const subscriptions = await Subscription.findAll();

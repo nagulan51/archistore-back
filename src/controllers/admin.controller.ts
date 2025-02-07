@@ -5,7 +5,7 @@ import { File } from "../models/file.model";
 export const getAllClients = async (req: Request, res: Response) => {
   try {
     const clients = await User.findAll({
-      attributes: ["id", "name", "email", "storageUsed", "storageLimit"],
+      attributes: ["id", "name", "email", "role", "created_at"],
     });
     res.status(200).json(clients);
   } catch (error) {
